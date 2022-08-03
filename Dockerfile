@@ -11,6 +11,7 @@ RUN apt-get update \
   gawk \
   git \
   man \
+  opam \
   sudo \
   vim \
   && apt-get -y clean \
@@ -29,3 +30,14 @@ RUN groupadd -g ${GID} ${GROUPNAME} \
 USER ${UID}
 
 WORKDIR /workdir
+
+ENV OCAML_VERSION=4.14.0
+
+RUN opam init --disable-sandboxing \
+  && eval $(opam env) \
+  && opam switch create ${OCAML_VERSION} \
+  && eval $(opam env) \
+  && opam install --yes dune utop ocaml-lsp-server
+
+RUN echo 'export PATH="~/.opam/${OCAML_VERSION}/bin:${PATH}"' >> ~/.bashrc \
+  && echo 'eval $(opam env)' >> ~/.bashrc
