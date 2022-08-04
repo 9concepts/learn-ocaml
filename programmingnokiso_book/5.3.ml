@@ -1,0 +1,31 @@
+(* 誕生月 m と誕生日 d を受け取り、星座を返す *)
+(* seiza : int -> int -> string *)
+let seiza m d =
+  if m = 1 then if d <= 19 then "やぎ" else "みずがめ"
+  else if m = 2 then if d <= 18 then "みずがめ" else "うお"
+  else if m = 3 then if d <= 20 then "うお" else "おひつじ"
+  else if m = 4 then if d <= 19 then "おひつじ" else "おうし"
+  else if m = 5 then if d <= 20 then "おうし" else "ふたご"
+  else if m = 6 then if d <= 21 then "ふたご" else "かに"
+  else if m = 7 then if d <= 22 then "かに" else "しし"
+  else if m = 8 then if d <= 22 then "しし" else "おとめ"
+  else if m = 9 then if d <= 22 then "おとめ" else "てんびん"
+  else if m = 10 then if d <= 23 then "てんびん" else "さそり"
+  else if m = 11 then if d <= 22 then "さそり" else "いて"
+  else if m = 12 then if d <= 21 then "いて" else "やぎ"
+  else ""
+
+(* テスト *)
+let test = seiza 3 21 = "おひつじ"
+let test = seiza 4 20 = "おうし"
+let test = seiza 5 21 = "ふたご"
+let test = seiza 6 22 = "かに"
+let test = seiza 7 23 = "しし"
+let test = seiza 8 23 = "おとめ"
+let test = seiza 9 23 = "てんびん"
+let test = seiza 10 24 = "さそり"
+let test = seiza 11 23 = "いて"
+let test = seiza 12 22 = "やぎ"
+let test = seiza 1 19 = "やぎ"
+let test = seiza 1 20 = "みずがめ"
+let test = seiza 2 19 = "うお"
