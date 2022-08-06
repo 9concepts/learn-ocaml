@@ -101,3 +101,40 @@ let test7 =
       gakusei_g;
     ]
   = (2, 1, 3, 1)
+
+(* ふたつのリストを結合 *)
+let rec append list1 list2 =
+  match list1 with
+  | [] -> list2
+  | first :: rest -> first :: append rest list2
+
+let test_append0 = append [] [] = []
+let test_append1 = append [] [ 1; 2 ] = [ 1; 2 ]
+let test_append2 = append [ 1; 2 ] [] = [ 1; 2 ]
+let test_append3 = append [ 1; 2; 3 ] [ 3; 4 ] = [ 1; 2; 3; 3; 4 ]
+let test_list_append0 = List.append [] [] = []
+let test_list_append1 = List.append [] [ 1; 2 ] = [ 1; 2 ]
+let test_list_append2 = List.append [ 1; 2 ] [] = [ 1; 2 ]
+let test_list_append3 = List.append [ 1; 2; 3 ] [ 3; 4 ] = [ 1; 2; 3; 3; 4 ]
+let test_append3 = append [ 1; 2; 3 ] [ 3; 4 ] = [ 1; 2; 3; 3; 4 ]
+let test_append_syntax_sugar0 = [] @ [] = []
+let test_append_syntax_sugar1 = [] @ [ 1; 2 ] = [ 1; 2 ]
+let test_append_syntax_sugar2 = [ 1; 2 ] @ [] = [ 1; 2 ]
+let test_append_syntax_sugar3 = [ 1; 2; 3 ] @ [ 3; 4 ] = [ 1; 2; 3; 3; 4 ]
+
+(* ソート済みの配列2つを結合する *)
+let rec merge list1 list2 =
+  match (list1, list2) with
+  | [], [] -> []
+  | [], _ :: _ -> list2
+  | _ :: _, [] -> list1
+  | h1 :: t1, h2 :: t2 ->
+      if h1 < h2 then [ h1; h2 ] @ merge t1 t2 else [ h2; h1 ] @ merge t1 t2
+
+(* テスト *)
+let test_merge_0 = merge [] [] = []
+let test_merge_1 = merge [] [ 1; 2 ] = [ 1; 2 ]
+let test_merge_2 = merge [ 1; 2 ] [] = [ 1; 2 ]
+let test_merge_3 = merge [ 1; 3 ] [ 2; 4 ] = [ 1; 2; 3; 4 ]
+let test_merge_4 = merge [ 2; 4 ] [ 1; 3 ] = [ 1; 2; 3; 4 ]
+let test_merge_5 = merge [ 1; 4 ] [ 1; 3 ] = [ 1; 1; 3; 4 ]
