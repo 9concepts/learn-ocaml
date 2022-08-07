@@ -134,9 +134,11 @@ let dijkstra start_node v_list =
     match v with
     | [] -> u
     | head :: rest ->
-        aux (min_node v :: u)
-          (koushin (min_node v)
-             (filter (fun node -> node.name <> (min_node v).name) v))
+        let next_node = min_node v in
+        let is_not_same_node = function
+          | { name } -> name <> next_node.name
+        in
+        aux (next_node :: u) (koushin next_node (filter is_not_same_node v))
   in
   aux [] (start_node :: v_list)
 
