@@ -758,7 +758,7 @@ let test_uniq =
 let seiretsu ekimei_list = uniq "" (insert_sort ekimei_list)
 
 (* let test_seiretsu = seiretsu global_ekimei_list *)
-let global_eki_list = make_eki_list (seiretsu global_ekimei_list)
+(* let global_eki_list = make_eki_list (seiretsu global_ekimei_list) *)
 
 (* 13.6 *)
 (* 直前に確定した駅 p (eki_t) と未確定の駅 q (eki_t) を受け取り、直接つながっている場合は最短距離を更新する *)
@@ -828,7 +828,7 @@ let global_eki_list = make_eki_list (seiretsu global_ekimei_list)
 
 (* 14.7 *)
 (* koushin1 を koushin の局所関数定義にもっていく *)
-let koushin p v =
+let koushin p v edges =
   let rec find_edge p q edges =
     match ((p, q), edges) with
     | (_, _), [] -> None
@@ -841,7 +841,7 @@ let koushin p v =
         else find_edge p q t
   in
   let koushin1 p q =
-    match find_edge p q global_ekikan_list with
+    match find_edge p q edges with
     | None -> q (* p, q が直接つながっていなかったら何もしない *)
     | Some edge -> (
         match (p, q, edge) with
@@ -867,6 +867,7 @@ let test_koushin =
       { namae = "東大前"; saitan_kyori = infinity; temae_list = [] };
       { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
     ]
+    global_ekikan_list
   = [
       { namae = "飯田橋"; saitan_kyori = 1.1; temae_list = [ "飯田橋"; "市ヶ谷" ] };
       { namae = "後楽園"; saitan_kyori = infinity; temae_list = [] };
@@ -882,6 +883,7 @@ let test_koushin =
       { namae = "東大前"; saitan_kyori = infinity; temae_list = [] };
       { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
     ]
+    global_ekikan_list
   = [
       {
         namae = "後楽園";
@@ -891,3 +893,80 @@ let test_koushin =
       { namae = "東大前"; saitan_kyori = infinity; temae_list = [] };
       { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
     ]
+
+let min_kyori_node node_list =
+  let rec min current_min_node = function
+    | [] -> current_min_node
+    | head :: rest ->
+        let incomming_node = min current_min_node rest in
+        if head.saitan_kyori < incomming_node.saitan_kyori then head
+        else incomming_node
+  in
+  min { namae = ""; saitan_kyori = infinity; temae_list = [] } node_list
+
+let test_min_kyori_node =
+  min_kyori_node
+    [
+      { namae = "飯田橋"; saitan_kyori = 1.1; temae_list = [ "飯田橋"; "市ヶ谷" ] };
+      { namae = "後楽園"; saitan_kyori = 8.; temae_list = [] };
+      { namae = "東大前"; saitan_kyori = 0.9; temae_list = [] };
+      { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
+    ]
+  = { namae = "東大前"; saitan_kyori = 0.9; temae_list = [] }
+
+let saitan_wo_bunri node_list =
+  let rec filter f = function
+    | [] -> []
+    | h :: t -> if f h then h :: filter f t else filter f t
+  in
+  let min_node = min_kyori_node node_list in
+  filter (fun node -> node.namae <> min_node.namae) node_list
+
+let test_saitan_wo_bunri =
+  saitan_wo_bunri
+    [
+      { namae = "飯田橋"; saitan_kyori = 1.1; temae_list = [ "飯田橋"; "市ヶ谷" ] };
+      { namae = "後楽園"; saitan_kyori = 8.; temae_list = [] };
+      { namae = "東大前"; saitan_kyori = 0.9; temae_list = [] };
+      { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
+    ]
+  = [
+      { namae = "飯田橋"; saitan_kyori = 1.1; temae_list = [ "飯田橋"; "市ヶ谷" ] };
+      { namae = "後楽園"; saitan_kyori = 8.; temae_list = [] };
+      { namae = "本駒込"; saitan_kyori = infinity; temae_list = [] };
+    ]
+
+let dijkstra_main node_list edges =
+  let rec aux u v =
+    match v with
+    | [] -> u
+    | head :: rest ->
+        let min_node = min_kyori_node v in
+        let other_nodes = saitan_wo_bunri v in
+        aux (min_node :: u) (koushin min_node other_nodes edges)
+  in
+  aux [] node_list
+
+(* let test_dijkstra_main =
+   dijkstra_main
+     (shokika (make_eki_list (seiretsu global_ekimei_list)) "千駄木")
+     global_ekikan_list *)
+
+let dijkstra start_eki_kanji end_eki_kanji =
+  let rec find_node name = function
+    | [] -> None
+    | head :: rest ->
+        if head.namae = name then Some head else find_node name rest
+  in
+  (* 重複のない駅のリスト *)
+  let global_eki_list = make_eki_list (seiretsu global_ekimei_list) in
+  let v = shokika global_eki_list start_eki_kanji in
+  let node_list = dijkstra_main v global_ekikan_list in
+  match find_node end_eki_kanji node_list with
+  | None -> []
+  | Some node -> node.temae_list
+
+let test_dijkstra = dijkstra "千駄木" "東京"
+let test_dijkstra = dijkstra "千駄木" "新宿"
+let test_dijkstra = dijkstra "千駄木" "西日暮里"
+let test_dijkstra = dijkstra "千駄木" "池袋"
