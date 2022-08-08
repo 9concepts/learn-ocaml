@@ -1,0 +1,4 @@
+(library
+ (name hello_world)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
