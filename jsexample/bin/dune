@@ -1,0 +1,7 @@
+(executable
+ ; (public_name jsexample)
+ (name main)
+ (modes js)
+ (libraries jsexample)
+ (preprocess
+  (pps ppx_inline_test)))

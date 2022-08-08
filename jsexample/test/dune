@@ -1,0 +1,4 @@
+(test
+ (name jsexample)
+ (preprocess
+  (pps ppx_inline_test)))
