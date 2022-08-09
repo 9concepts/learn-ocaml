@@ -12,3 +12,9 @@ dune build
 dune test
 dune exec dune_example
 ```
+
+- `(lang dune 3.4)` の文法はS式と呼ばれるらしい。
+
+## 参考
+
+- [Easy Dune (OCaml): Running a Script - DEV Community](https://dev.to/pckilgore/unofficial-dune-ocaml-how-to-running-a-script-2fgh)

@@ -1,4 +1,9 @@
-(library
- (name hello_world)
- (inline_tests)
- (preprocess (pps ppx_inline_test)))
+;
+; dune build @helloworld
+;
+
+(rule
+ (alias helloworld)
+ (deps (universe))
+ (action
+  (run echo "Hello World!")))
